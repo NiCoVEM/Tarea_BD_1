@@ -1,9 +1,17 @@
-SELECT TOP 10 * FROM ArticulosSimple;
+USE CongresoDB;
+GO
 
-SELECT * FROM Personas WHERE Rut BETWEEN '00000001-K' AND '00000050-K';
+-- Ver los primeros artículos
+SELECT * FROM ArticulosSimple;
 
-SELECT R.*, T.topico_especialidad
+-- Ver autores
+SELECT * FROM Personas;
+
+-- Ver revisores con tópicos
+SELECT R.Rut, R.Nombre, R.Email, T.topico_especialidad
 FROM Revisores R
-JOIN TopicoEspecialidad T ON R.ID_topico_especialidad = T.ID_topico_especialidad;
+JOIN Revisor_Topicos RT ON R.Rut = RT.Rut
+JOIN TopicoEspecialidad T ON RT.ID_topico_especialidad = T.ID_topico_especialidad;
 
-SELECT * FROM TopicoEspecialidad;
+-- Consultar el Diccionario de Datos
+SELECT * FROM DiccionarioDeDatos;
