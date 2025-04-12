@@ -22,6 +22,10 @@ CREATE TABLE Autores (
 	FOREIGN KEY (Rut) REFERENCES Personas (Rut)
 );
 
+CREATE TABLE Participantes (
+	contacto NVARCHAR(50)
+);
+
 CREATE TABLE Revisor_Topicos (
     Rut INT,
     ID_topico_especialidad INT,
@@ -38,7 +42,7 @@ CREATE TABLE ArticulosSimple (
     Topicos NVARCHAR(255),
     ID_Topico_Especialidad INT,
     Autores NVARCHAR(255),
-    FOREIGN KEY (ID_Topico_Especialidad) REFERENCES TopicoEspecialidad(ID_topico_especialidad)
+    FOREIGN KEY (ID_Topico_Especialidad) REFERENCES TopicoEspecialidad(ID_topico_especialidad),
 );
 
 CREATE TABLE DiccionarioDeDatos (
@@ -126,7 +130,7 @@ BEGIN
 
         DECLARE @numTopicos INT = 1 + ABS(CHECKSUM(NEWID())) % 3; 
         DECLARE @j INT = 0;
-	
+
         WHILE @j < @numTopicos
         BEGIN
             DECLARE @topicoID INT = 1 + ABS(CHECKSUM(NEWID())) % 20;
@@ -156,16 +160,24 @@ BEGIN
     DECLARE @topicos NVARCHAR(255) = 
         CASE WHEN @artID % 3 = 0 THEN @topico1 + ', ' + @topico2 ELSE @topico1 END;
 
-    DECLARE @autor1 NVARCHAR(100) = (
-        SELECT TOP 1 Nombre + ' <' + Email + '>' FROM Personas 
-        WHERE Rut NOT IN (SELECT Rut FROM Revisores) ORDER BY NEWID()
-    );
-    DECLARE @autor2 NVARCHAR(100) = (
-        SELECT TOP 1 Nombre + ' <' + Email + '>' FROM Personas 
-        WHERE Rut NOT IN (SELECT Rut FROM Revisores) ORDER BY NEWID()
-    );
-    DECLARE @autores NVARCHAR(255) = 
-        CASE WHEN @artID % 4 = 0 THEN @autor1 + ', ' + @autor2 ELSE @autor1 END;
+	-- Elegir RUTs desde la tabla Autores
+	DECLARE @rutAutor1 INT = (SELECT TOP 1 Rut FROM Autores ORDER BY NEWID());
+	DECLARE @rutAutor2 INT = (SELECT TOP 1 Rut FROM Autores WHERE Rut != @rutAutor1 ORDER BY NEWID());
+	DECLARE @rutAutor3 INT = (SELECT TOP 1 Rut FROM Autores WHERE Rut NOT IN (@rutAutor1, @rutAutor2) ORDER BY NEWID());
+
+	-- Obtener los datos de cada autor desde Personas
+	DECLARE @autor1 NVARCHAR(100) = (SELECT Nombre + ' <' + Email + '>' FROM Personas WHERE Rut = @rutAutor1);
+	DECLARE @autor2 NVARCHAR(100) = (SELECT Nombre + ' <' + Email + '>' FROM Personas WHERE Rut = @rutAutor2);
+	DECLARE @autor3 NVARCHAR(100) = (SELECT Nombre + ' <' + Email + '>' FROM Personas WHERE Rut = @rutAutor3);
+
+	-- Definir autores combinados con lógica aleatoria
+	DECLARE @autores NVARCHAR(255) = 
+    CASE 
+        WHEN ABS(CHECKSUM(NEWID())) % 3 = 0 THEN @autor1 + ', ' + @autor2 + ', ' + @autor3
+        WHEN ABS(CHECKSUM(NEWID())) % 2 = 0 THEN @autor1 + ', ' + @autor2
+        ELSE @autor1 
+    END;
+
 
     DECLARE @idTopicoPrincipal INT = 1 + ABS(CHECKSUM(NEWID())) % 20;
 

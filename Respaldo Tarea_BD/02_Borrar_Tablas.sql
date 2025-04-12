@@ -9,5 +9,6 @@ DROP TABLE IF EXISTS ArticulosSimple;
 DROP TABLE IF EXISTS DiccionarioDeDatos;
 DROP TABLE IF EXISTS Revisores;
 DROP TABLE IF EXISTS Autores;
+DROP TABLE IF EXISTS Participantes;
 DROP TABLE IF EXISTS Personas;
 DROP TABLE IF EXISTS TopicoEspecialidad;
