@@ -266,20 +266,39 @@ BEGIN
     SET @revArtID += 1;
 END
 
--- 5. Diccionario de datos
 INSERT INTO DiccionarioDeDatos (Tabla, Columna, TipoDato, Descripcion, PermiteNULL, Clave) VALUES
-('Personas', 'Rut', 'INT', 'Identificador único', 'NO', 'PK'),
-('Personas', 'Nombre', 'VARCHAR(50)', 'Nombre completo', 'NO', ''),
-('Personas', 'Email', 'VARCHAR(80)', 'Correo electrónico', 'NO', ''),
-('Revisores', 'Rut', 'INT', 'Identificador revisor', 'NO', 'PK/FK'),
-('Revisor_Topicos', 'Rut', 'INT', 'Identificador revisor', 'NO', 'FK'),
-('Revisor_Topicos', 'ID_topico_especialidad', 'INT', 'Especialidad', 'NO', 'FK'),
+
+-- Personas y subclases
+('Personas', 'Rut', 'INT', 'Identificador único de la persona', 'NO', 'PK'),
+('Personas', 'Nombre', 'VARCHAR(50)', 'Nombre completo de la persona', 'NO', ''),
+('Personas', 'Email', 'VARCHAR(80)', 'Correo electrónico de la persona', 'NO', ''),
+
+('Autores', 'Rut', 'INT', 'Rut del autor, referencia a Personas', 'NO', 'PK/FK'),
+('Revisores', 'Rut', 'INT', 'Rut del revisor, referencia a Personas', 'NO', 'PK/FK'),
+
+-- Artículos
+('ArticulosSimple', 'ID_Art', 'INT', 'Identificador del artículo', 'NO', 'PK'),
+('ArticulosSimple', 'Titulo', 'NVARCHAR(255)', 'Título del artículo', 'NO', ''),
+('ArticulosSimple', 'FechaEnvio', 'DATE', 'Fecha de envío del artículo', 'NO', ''),
+('ArticulosSimple', 'Resumen', 'NVARCHAR(MAX)', 'Resumen del artículo', 'NO', ''),
+('ArticulosSimple', 'Topicos', 'NVARCHAR(255)', 'Tópicos como texto separado por comas', 'NO', ''),
+('ArticulosSimple', 'ID_Topico_Especialidad', 'INT', 'Tópico principal, FK a TopicoEspecialidad', 'NO', 'FK'),
+('ArticulosSimple', 'contacto', 'NVARCHAR(255)', 'Correo del autor de contacto (referencia indirecta)', 'NO', ''),
+
+-- Participantes
+('Participantes', 'ID_Art', 'INT', 'ID del artículo, FK a ArticulosSimple', 'NO', 'FK'),
+('Participantes', 'contacto', 'NVARCHAR(255)', 'Correo del autor participante', 'NO', ''),
+
+-- Tópicos
 ('TopicoEspecialidad', 'ID_topico_especialidad', 'INT', 'ID del tópico', 'NO', 'PK'),
 ('TopicoEspecialidad', 'topico_especialidad', 'VARCHAR(50)', 'Nombre del tópico', 'NO', ''),
-('ArticulosSimple', 'ID_Art', 'INT', 'ID del artículo', 'NO', 'PK'),
-('ArticulosSimple', 'Titulo', 'NVARCHAR(255)', 'Título del artículo', 'NO', ''),
-('ArticulosSimple', 'FechaEnvio', 'DATE', 'Fecha de envío', 'NO', ''),
-('ArticulosSimple', 'Resumen', 'NVARCHAR(MAX)', 'Resumen del artículo', 'NO', ''),
-('ArticulosSimple', 'Topicos', 'NVARCHAR(255)', 'Tópicos del artículo', 'NO', ''),
-('ArticulosSimple', 'ID_Topico_Especialidad', 'INT', 'Tópico principal', 'NO', 'FK'),
-('ArticulosSimple', 'Autores', 'NVARCHAR(255)', 'Autores del artículo', 'NO', '');
+
+-- Relaciones muchos a muchos
+('Articulo_Topico', 'ID_Art', 'INT', 'ID del artículo, FK a ArticulosSimple', 'NO', 'PK/FK'),
+('Articulo_Topico', 'ID_topico_especialidad', 'INT', 'ID del tópico, FK a TopicoEspecialidad', 'NO', 'PK/FK'),
+
+('Revisor_Topicos', 'Rut', 'INT', 'Rut del revisor, FK a Revisores', 'NO', 'PK/FK'),
+('Revisor_Topicos', 'ID_topico_especialidad', 'INT', 'ID del tópico de especialidad', 'NO', 'PK/FK'),
+
+('RevisionArticulos', 'ID_Art', 'INT', 'ID del artículo, FK a ArticulosSimple', 'NO', 'PK/FK'),
+('RevisionArticulos', 'Rut_Revisor', 'INT', 'Rut del revisor asignado, FK a Revisores', 'NO', 'PK/FK');
